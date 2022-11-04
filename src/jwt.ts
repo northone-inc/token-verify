@@ -1,35 +1,23 @@
 import JwksClient from 'jwks-rsa'
 import * as jwt from 'jsonwebtoken'
-import {
-  BATPayload,
-  InternalNorthOneAuthorizerResponseContext,
-  JWTPayload,
-  NORTHONE_CLAIMS,
-  PartialBat,
-  RATPayload,
-  TokenClaims,
-} from './types'
+import { CustomJWTPayload } from './types'
 
-export const ALLOWED_ISSUERS = (AUTH0_DOMAIN: string, NORTHONE_AUTH_DOMAIN: string) => [
-  `https://${AUTH0_DOMAIN}/`,
-  `https://${NORTHONE_AUTH_DOMAIN}/`,
-]
-
-const NORTHONE_DOMAIN = 'https://northone.com/'
-
-const auth0JwksClient = (AUTH0_DOMAIN: string) =>
+const jwksClient = (ISSUER_DOMAIN: string) =>
   JwksClient({
-    jwksUri: `https://${AUTH0_DOMAIN}/.well-known/jwks.json`,
+    jwksUri: `https://${ISSUER_DOMAIN}/.well-known/jwks.json`,
   })
 
-let auth0PublicKey: string | undefined
+let publicKey: string | undefined
+
 /**
- * Return the public key used to verify an Auth0 JWT
+ *
+ * @param ISSUER_DOMAIN The domain returning the public key - `https://${ISSUER_DOMAIN}/.well-known/jwks.json`
+ * @returns publicKey
  */
-const getAuth0PublicKey = async (AUTH0_DOMAIN: string): Promise<string> => {
-  const client = auth0JwksClient(AUTH0_DOMAIN)
-  if (auth0PublicKey) {
-    return auth0PublicKey
+const getPublicKey = async (ISSUER_DOMAIN: string): Promise<string> => {
+  const client = jwksClient(ISSUER_DOMAIN)
+  if (publicKey) {
+    return publicKey
   }
 
   const signingKeys = await client.getSigningKeys()
@@ -38,58 +26,37 @@ const getAuth0PublicKey = async (AUTH0_DOMAIN: string): Promise<string> => {
   }
   const keyInfo = signingKeys[0]
 
-  auth0PublicKey = 'publicKey' in keyInfo ? keyInfo.publicKey : keyInfo.rsaPublicKey
+  publicKey = 'publicKey' in keyInfo ? keyInfo.publicKey : keyInfo.rsaPublicKey
 
-  return auth0PublicKey
+  return publicKey
 }
 
-export const decodeAndVerifyJWT = async ({
+export const verifyAndDecodeJWT = async <T extends {}>({
   token,
-  AUTH0_AUDIENCE,
-  AUTH0_DOMAIN,
-  NORTHONE_AUTH_DOMAIN,
+  audience,
+  publicKeyIssuerDomain,
+  otherIssuerDomains,
+  onError,
 }: {
   token: string
-  AUTH0_AUDIENCE: string
-  AUTH0_DOMAIN: string
-  NORTHONE_AUTH_DOMAIN: string
-}): Promise<JWTPayload | RATPayload | BATPayload> => {
-  const pubKey = await getAuth0PublicKey(AUTH0_DOMAIN)
-  const decodedToken = jwt.verify(token, pubKey, {
-    audience: AUTH0_AUDIENCE,
-    issuer: [AUTH0_DOMAIN, NORTHONE_AUTH_DOMAIN],
-  }) as JWTPayload | RATPayload | BATPayload
+  audience: string
+  publicKeyIssuerDomain: string
+  otherIssuerDomains: string[]
+  onError?: (err: unknown) => void
+}): Promise<CustomJWTPayload<T>> => {
+  try {
+    const pubKey = await getPublicKey(publicKeyIssuerDomain)
+    const decodedToken = jwt.verify(token, pubKey, {
+      audience,
+      issuer: [publicKeyIssuerDomain, ...otherIssuerDomains],
+    }) as CustomJWTPayload<T>
 
-  return decodedToken
+    return decodedToken
+  } catch (err) {
+    onError && onError(err)
+    throw err
+  }
 }
 
-export const hasClaim = (payload: PartialBat, claim: TokenClaims): claim is TokenClaims => claim in payload
-
-const getField = (claim: TokenClaims) => {
-  let field
-  if (claim.includes(NORTHONE_DOMAIN)) {
-    field = claim.split(NORTHONE_DOMAIN)[1]
-  }
-  if (claim.includes('business') || claim.includes('user')) {
-    field += 'Id'
-  }
-  return field || claim
-}
-
-export const introspectToken = ({
-  tokenPayload,
-  bearerToken,
-}: {
-  tokenPayload: PartialBat
-  bearerToken: string
-}): InternalNorthOneAuthorizerResponseContext => {
-  const res: InternalNorthOneAuthorizerResponseContext = { bearerToken }
-
-  for (const claim of [...NORTHONE_CLAIMS, 'scope'] as TokenClaims[]) {
-    if (hasClaim(tokenPayload, claim)) {
-      res[getField(claim)] = tokenPayload[claim]
-    }
-  }
-
-  return res
-}
+export const hasClaim = <T extends {}>(payload: CustomJWTPayload<T>, claim: any): claim is keyof CustomJWTPayload<T> =>
+  claim in payload
