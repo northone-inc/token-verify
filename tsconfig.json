@@ -1,0 +1,15 @@
+{
+  "extends": "@northone/tsconfig",
+  "include": ["src/**/*.ts", "serverless.ts", "sls-*.ts"],
+  "exclude": ["node_modules/**/*", ".vscode/**/*", "dist/**/*"],
+  "compilerOptions": {
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true
+  }
+}
