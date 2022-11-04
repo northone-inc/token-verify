@@ -9,4 +9,7 @@ export interface JWTPayload {
   gty: string | string[]
 }
 
+/**
+ * Adds custom claims to base JWT payload
+ */
 export type CustomJWTPayload<T extends {}> = T & JWTPayload
