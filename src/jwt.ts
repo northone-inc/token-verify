@@ -2,21 +2,20 @@ import JwksClient from 'jwks-rsa'
 import * as jwt from 'jsonwebtoken'
 import { CustomJWTPayload } from './types'
 
-/**
- * @param param0
- * @returns
- */
 export const jwtClient = ({
   audience,
-  publicKeyIssuerDomain,
-  otherIssuerDomains,
+  jwksUri,
+  issuers,
 }: {
   audience: string
-  publicKeyIssuerDomain: string
-  otherIssuerDomains: string[]
+  /**
+   * Format without https or trailing backslash, i.e 'issuerdomain.com'
+   */
+  jwksUri: string
+  issuers: string[]
 }) => {
   const jwksClient = JwksClient({
-    jwksUri: `https://${publicKeyIssuerDomain}/.well-known/jwks.json`,
+    jwksUri,
   })
   let publicKey: string | undefined
 
@@ -24,38 +23,29 @@ export const jwtClient = ({
     if (publicKey) {
       return publicKey
     }
-
     const signingKeys = await jwksClient.getSigningKeys()
+
     if (!signingKeys || !signingKeys[0]) {
       throw new Error('No keys returned')
     }
     const keyInfo = signingKeys[0]
-
     publicKey = 'publicKey' in keyInfo ? keyInfo.publicKey : keyInfo.rsaPublicKey
 
     return publicKey
   }
 
-  const verifyAndDecode = async <T extends {}>(
-    token: string,
-    onError?: (err: unknown) => void,
-  ): Promise<CustomJWTPayload<T>> => {
-    try {
-      const pubKey = await getPublicKey()
-      const decodedToken = jwt.verify(token, pubKey, {
-        audience,
-        issuer: [publicKeyIssuerDomain, ...otherIssuerDomains],
-      }) as CustomJWTPayload<T>
+  const verifyAndDecode = async <T extends {}>(token: string): Promise<CustomJWTPayload<T>> => {
+    const pubKey = await getPublicKey()
 
-      return decodedToken
-    } catch (err) {
-      onError && onError(err)
-      throw err
-    }
+    const decodedToken = jwt.verify(token, pubKey, {
+      audience,
+      issuer: issuers,
+    }) as CustomJWTPayload<T>
+
+    return decodedToken
   }
 
   return {
-    getPublicKey,
     verifyAndDecode,
   }
 }

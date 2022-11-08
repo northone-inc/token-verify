@@ -1,6 +1,12 @@
 {
   "extends": "@northone/tsconfig",
-  "include": ["src/**/*.ts", "serverless.ts", "sls-*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "serverless.ts",
+    "sls-*.ts",
+    "src/__tests__/client.test.js",
+    "src/__tests__/test-server.js"
+  ],
   "exclude": ["node_modules/**/*", ".vscode/**/*", "dist/**/*"],
   "compilerOptions": {
     "outDir": "dist",
