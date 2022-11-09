@@ -1,21 +1,4 @@
 {
-  "extends": "@northone/tsconfig",
-  "include": [
-    "src/**/*.ts",
-    "serverless.ts",
-    "sls-*.ts",
-    "src/__tests__/client.test.js",
-    "src/__tests__/test-server.js"
-  ],
-  "exclude": ["node_modules/**/*", ".vscode/**/*", "dist/**/*"],
-  "compilerOptions": {
-    "outDir": "dist",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "allowSyntheticDefaultImports": true
-  }
+  "extends": "@tsconfig/node16/tsconfig.json",
+  "include": ["src"],
 }

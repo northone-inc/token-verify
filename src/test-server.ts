@@ -31,13 +31,14 @@ export const createApp = ({ jwksUri }: { jwksUri: string }) => {
     })
     .get('/verifyAndDecode', async (ctx) => {
       const token = ctx.header.authorization?.split('Bearer ')[1]
-      if (!token) {
+      if (!token)
         throw new Error('No token in auth header')
-      }
+
       try {
         const decodedToken = await tokenClient.verifyAndDecode(token)
         ctx.body = decodedToken
-      } catch (err: any) {
+      }
+      catch (err: any) {
         ctx.status = 400
         ctx.body = { error: err }
       }

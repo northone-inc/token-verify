@@ -1,9 +1,9 @@
-import { createApp } from '../test-server'
 import createJWKSMock from 'mock-jwks'
 import supertest from 'supertest'
-import Koa from 'koa'
-import { jwtClient } from '../jwt'
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import type Koa from 'koa'
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { jwtClient as jwtSourceClient } from '../jwt'
+import { createApp } from '../test-server'
 
 type TJwksMock = ReturnType<typeof createJWKSMock>
 type TRequest = supertest.SuperTest<supertest.Test>
@@ -12,36 +12,59 @@ type TServer = ReturnType<Koa<Koa.DefaultState, Koa.DefaultContext>['listen']>
 const testAudience = 'private'
 const testIssuers = ['primary', 'secondary']
 
-const createContext = () => {
-  const jwksUri = 'https://test.com/.well-known/jwks.json'
-  const jwksMock = createJWKSMock('https://test.com')
-  const server = createApp({ jwksUri }).listen()
-  const request = supertest(server)
-  const tokenClient = jwtClient({
-    audience: testAudience,
-    issuers: testIssuers,
-    jwksUri,
-  })
-  return {
-    jwksMock,
-    request,
-    server,
-    tokenClient,
-  }
-}
-const tearDown = async ({ jwksMock, server }: { jwksMock: TJwksMock; server: TServer }) => {
-  await server.close()
-  await jwksMock.stop()
-}
+class ImportError extends Error {}
 
 describe('jwtClient', () => {
   let jwksMock: TJwksMock
   let request: TRequest
   let server: TServer
-  let tokenClient: ReturnType<typeof jwtClient>
+  let tokenClient: ReturnType<typeof jwtSourceClient>
+  let client: typeof jwtSourceClient
+
+  const createContext = () => {
+    const jwksUri = 'https://test.com/.well-known/jwks.json'
+    const jwksMock = createJWKSMock('https://test.com')
+    const server = createApp({ jwksUri }).listen()
+    const request = supertest(server)
+    const tokenClient = client({
+      audience: testAudience,
+      issuer: testIssuers,
+      jwksUri,
+    })
+    return {
+      jwksMock,
+      request,
+      server,
+      tokenClient,
+    }
+  }
+  const tearDown = async ({ jwksMock, server }: { jwksMock: TJwksMock; server: TServer }) => {
+    await server.close()
+    await jwksMock.stop()
+  }
+
+  beforeAll(async () => {
+    // If env var "VITEST_USE_DIST" has any truthy value (not "false" and not "0")
+    // run tests against the built dist client instead of typescreipt
+    // default is using default typescript client
+    client = jwtSourceClient
+    const sourceModulePath = '../../dist/jwt'
+    if (process.env.VITEST_USE_DIST
+        && process.env.VITEST_USE_DIST.length > 0
+        && process.env.VITEST_USE_DIST.toString().toLowerCase() !== 'false'
+        && process.env.VITEST_USE_DIST !== '0'
+    ) {
+      try {
+        client = await import(sourceModulePath)
+      }
+      catch (e) {
+        throw new ImportError(`Unable to import module ${sourceModulePath}. You must build first to process.env.DIST`)
+      }
+    }
+  })
 
   beforeEach(() => {
-    ;({ jwksMock, server, request, tokenClient } = createContext())
+    ({ jwksMock, server, request, tokenClient } = createContext())
   })
   afterEach(async () => await tearDown({ jwksMock, server }))
 
@@ -85,8 +108,9 @@ describe('jwtClient', () => {
       const accessToken = jwksMock.token(claims)
       try {
         await tokenClient.verifyAndDecode(accessToken)
-      } catch (e) {
-        expect(e).toMatchInlineSnapshot(`[TokenExpiredError: jwt expired]`)
+      }
+      catch (e) {
+        expect(e).toMatchInlineSnapshot('[TokenExpiredError: jwt expired]')
       }
       expect.hasAssertions()
     })
@@ -99,8 +123,9 @@ describe('jwtClient', () => {
       })
       try {
         await tokenClient.verifyAndDecode(accessToken)
-      } catch (e) {
-        expect(e).toMatchInlineSnapshot(`[JsonWebTokenError: jwt audience invalid. expected: private]`)
+      }
+      catch (e) {
+        expect(e).toMatchInlineSnapshot('[JsonWebTokenError: jwt audience invalid. expected: private]')
       }
       expect.hasAssertions()
     })
@@ -113,8 +138,9 @@ describe('jwtClient', () => {
       })
       try {
         await tokenClient.verifyAndDecode(accessToken)
-      } catch (e) {
-        expect(e).toMatchInlineSnapshot(`[JsonWebTokenError: jwt issuer invalid. expected: primary,secondary]`)
+      }
+      catch (e) {
+        expect(e).toMatchInlineSnapshot('[JsonWebTokenError: jwt issuer invalid. expected: primary,secondary]')
       }
       expect.hasAssertions()
     })
@@ -129,13 +155,14 @@ describe('jwtClient', () => {
       })
       const [header, payload, signature] = accessToken.split('.')
 
-      const invalidSignature = signature + 'nonsense'
+      const invalidSignature = `${signature}nonsense`
       const invalidToken = [header, payload, invalidSignature].join('.')
 
       try {
         await tokenClient.verifyAndDecode(invalidToken)
-      } catch (e) {
-        expect(e).toMatchInlineSnapshot(`[JsonWebTokenError: invalid signature]`)
+      }
+      catch (e) {
+        expect(e).toMatchInlineSnapshot('[JsonWebTokenError: invalid signature]')
       }
       expect.hasAssertions()
     })
