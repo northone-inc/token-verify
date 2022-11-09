@@ -20,8 +20,8 @@ export const createApp = ({ jwksUri }: { jwksUri: string }) => {
 
   const tokenClient = jwtClient({
     audience: 'private',
-    jwksUri,
     issuers: ['master'],
+    jwksUri,
   })
 
   const router = new Router()

@@ -3,19 +3,23 @@ import createJWKSMock from 'mock-jwks'
 import supertest from 'supertest'
 import Koa from 'koa'
 import { jwtClient } from '../jwt'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 
 type TJwksMock = ReturnType<typeof createJWKSMock>
 type TRequest = supertest.SuperTest<supertest.Test>
 type TServer = ReturnType<Koa<Koa.DefaultState, Koa.DefaultContext>['listen']>
 
+const testAudience = 'private'
+const testIssuers = ['primary', 'secondary']
+
 const createContext = () => {
-  const jwksUri = 'https://northone-test.auth0.com/.well-known/jwks.json'
-  const jwksMock = createJWKSMock('https://northone-test.auth0.com')
+  const jwksUri = 'https://test.com/.well-known/jwks.json'
+  const jwksMock = createJWKSMock('https://test.com')
   const server = createApp({ jwksUri }).listen()
   const request = supertest(server)
   const tokenClient = jwtClient({
-    audience: 'private',
-    issuers: ['primary', 'secondary'],
+    audience: testAudience,
+    issuers: testIssuers,
     jwksUri,
   })
   return {
@@ -51,8 +55,8 @@ describe('jwtClient', () => {
     it('should get access with mock token when jwksMock is running', async () => {
       jwksMock.start()
       const access_token = jwksMock.token({
-        aud: 'private',
-        iss: 'primary',
+        aud: testAudience,
+        iss: testIssuers[0],
       })
       const { status } = await request.get('/').set('Authorization', `Bearer ${access_token}`)
       expect(status).toEqual(200)
@@ -60,25 +64,22 @@ describe('jwtClient', () => {
   })
 
   describe('token verify', () => {
-    it.each(['primary', 'secondary'])(
-      'should verify and decode token with valid audience and issuer',
-      async (iss: string) => {
-        jwksMock.start()
-        const claims = {
-          aud: 'private',
-          iss,
-        }
-        const accessToken = jwksMock.token(claims)
-        const decodedToken = await tokenClient.verifyAndDecode(accessToken)
-        expect(decodedToken).toEqual(expect.objectContaining(claims))
-      },
-    )
+    it.each(testIssuers)('should verify and decode token with valid audience and issuer', async (iss: string) => {
+      jwksMock.start()
+      const claims = {
+        aud: testAudience,
+        iss,
+      }
+      const accessToken = jwksMock.token(claims)
+      const decodedToken = await tokenClient.verifyAndDecode(accessToken)
+      expect(decodedToken).toEqual(expect.objectContaining(claims))
+    })
 
     it('should throw an error if token is expired', async () => {
       jwksMock.start()
       const claims = {
-        aud: 'private',
-        iss: 'primary',
+        aud: testAudience,
+        iss: testIssuers[0],
         exp: 0,
       }
       const accessToken = jwksMock.token(claims)
@@ -92,11 +93,10 @@ describe('jwtClient', () => {
 
     it('should throw an error if token audience is incorrect', async () => {
       jwksMock.start()
-      const claims = {
+      const accessToken = jwksMock.token({
         aud: 'incorrect',
-        iss: 'primary',
-      }
-      const accessToken = jwksMock.token(claims)
+        iss: testIssuers[0],
+      })
       try {
         await tokenClient.verifyAndDecode(accessToken)
       } catch (e) {
@@ -105,13 +105,12 @@ describe('jwtClient', () => {
       expect.hasAssertions()
     })
 
-    it('should throw an error if token issuer isn not valid', async () => {
+    it('should throw an error if token issuer is not valid', async () => {
       jwksMock.start()
-      const claims = {
-        aud: 'private',
+      const accessToken = jwksMock.token({
+        aud: testAudience,
         iss: 'incorrect',
-      }
-      const accessToken = jwksMock.token(claims)
+      })
       try {
         await tokenClient.verifyAndDecode(accessToken)
       } catch (e) {
@@ -124,14 +123,17 @@ describe('jwtClient', () => {
   describe('token signature', () => {
     it('should throw an error if token signature is invalid', async () => {
       jwksMock.start()
-      const accessToken =
-        jwksMock.token({
-          aud: 'private',
-          iss: 'primary',
-        }) + 'L89EeDgZiD94m'
+      const accessToken = jwksMock.token({
+        aud: testAudience,
+        iss: testIssuers[0],
+      })
+      const [header, payload, signature] = accessToken.split('.')
+
+      const invalidSignature = signature + 'nonsense'
+      const invalidToken = [header, payload, invalidSignature].join('.')
 
       try {
-        await tokenClient.verifyAndDecode(accessToken)
+        await tokenClient.verifyAndDecode(invalidToken)
       } catch (e) {
         expect(e).toMatchInlineSnapshot(`[JsonWebTokenError: invalid signature]`)
       }
