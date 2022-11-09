@@ -2,9 +2,9 @@
   "name": "@northone/token-verifier",
   "version": "1.0.0",
   "description": "Token client for verifying and decoding JWTs.",
-  "main": "src/jwt.ts",
+  "main": "dist/jwt.js",
   "scripts": {
-    "getAndVerifyToken": "ts-node ./src/__scripts__/getAndVerifyToken.ts",
+    "build": "node build.js",
     "test": "vitest"
   },
   "repository": {
