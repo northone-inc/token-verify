@@ -1,13 +1,6 @@
 import createJWKSMock from 'mock-jwks'
-import supertest from 'supertest'
-import type Koa from 'koa'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { jwtClient as jwtSourceClient } from '../jwt'
-import { createApp } from '../test-server'
-
-type TJwksMock = ReturnType<typeof createJWKSMock>
-type TRequest = supertest.SuperTest<supertest.Test>
-type TServer = ReturnType<Koa<Koa.DefaultState, Koa.DefaultContext>['listen']>
 
 const testAudience = 'private'
 const testIssuers = ['primary', 'secondary']
@@ -15,17 +8,13 @@ const testIssuers = ['primary', 'secondary']
 class ImportError extends Error {}
 
 describe('jwtClient', () => {
-  let jwksMock: TJwksMock
-  let request: TRequest
-  let server: TServer
+  let jwksMock: ReturnType<typeof createJWKSMock>
   let tokenClient: ReturnType<typeof jwtSourceClient>
   let client: typeof jwtSourceClient
 
   const createContext = () => {
     const jwksUri = 'https://test.com/.well-known/jwks.json'
     const jwksMock = createJWKSMock('https://test.com')
-    const server = createApp({ jwksUri }).listen()
-    const request = supertest(server)
     const tokenClient = client({
       audience: testAudience,
       issuer: testIssuers,
@@ -33,14 +22,8 @@ describe('jwtClient', () => {
     })
     return {
       jwksMock,
-      request,
-      server,
       tokenClient,
     }
-  }
-  const tearDown = async ({ jwksMock, server }: { jwksMock: TJwksMock; server: TServer }) => {
-    await server.close()
-    await jwksMock.stop()
   }
 
   beforeAll(async () => {
@@ -64,27 +47,9 @@ describe('jwtClient', () => {
   })
 
   beforeEach(() => {
-    ({ jwksMock, server, request, tokenClient } = createContext())
+    ({ jwksMock, tokenClient } = createContext())
   })
-  afterEach(async () => await tearDown({ jwksMock, server }))
-
-  describe('jwksMock', () => {
-    it('should not get access without correct token', async () => {
-      jwksMock.start()
-      const { status } = await request.get('/')
-      expect(status).toEqual(401)
-    })
-
-    it('should get access with mock token when jwksMock is running', async () => {
-      jwksMock.start()
-      const access_token = jwksMock.token({
-        aud: testAudience,
-        iss: testIssuers[0],
-      })
-      const { status } = await request.get('/').set('Authorization', `Bearer ${access_token}`)
-      expect(status).toEqual(200)
-    })
-  })
+  afterEach(async () => await jwksMock.stop())
 
   describe('token verify', () => {
     it.each(testIssuers)('should verify and decode token with valid audience and issuer', async (iss: string) => {

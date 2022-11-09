@@ -1,38 +1,21 @@
 import * as jwks from 'jwks-rsa'
 import * as jwt from 'jsonwebtoken'
 
-export interface JwtPayload extends jwt.JwtPayload {
-  iss: string
-  sub: string
-  aud: string | string[]
-  iat: number
-  exp: number
-  azp: string
-  scope: string
-  gty: string | string[]
-  [k: string]: any
-}
-
-/**
- * Adds custom claims to base JWT payload
- */
-export type CustomJwtPayload<T extends {}> = T & JwtPayload
-
 export const jwtClient = ({
   audience,
   jwksUri,
   issuer,
 }: {
   /**
-   * JWT Audience defines...
+   * The intended audience to verify on incoming tokens
    */
   audience: jwt.VerifyOptions['audience']
   /**
-   * JWT Issuer defines..
+   * The intended issuer(s) to verify on incoming tokens
    */
   issuer: jwt.VerifyOptions['issuer']
   /**
-   * Format without https or trailing backslash, i.e 'issuerdomain.com'
+   * URI where jwt public key is stored
    */
   jwksUri: jwks.Options['jwksUri']
   /**
@@ -63,17 +46,16 @@ export const jwtClient = ({
     return publicKey
   }
 
-  const verifyAndDecode = async <T extends {}>(token: string): Promise<CustomJwtPayload<T>> => {
+  const verifyAndDecode = async (token: string): Promise<string | jwt.JwtPayload> => {
     const pubKey = await getPublicKey()
 
     const decodedToken = jwt.verify(token, pubKey, {
       audience,
       issuer,
-      ...(jwt || {}),
-    }) as CustomJwtPayload<T>
-
+    })
     return decodedToken
   }
+
 
   return {
     verifyAndDecode,
