@@ -29,7 +29,8 @@
     "lint": "$(npm bin)/eslint .",
     "lint:fix": "$(npm bin)/eslint . --fix",
     "typegen": "$(npm bin)/tsc src/jwt.ts --declaration --emitDeclarationOnly --outDir dist",
-    "postbuild": "npm run typegen"
+    "postbuild": "npm run typegen",
+    "typecheck": "$(npm bin)/tsc --noEmit"
   },
   "contributers": [
     "Duncan Mann <duncan@northone.com>"
