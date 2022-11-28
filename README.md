@@ -24,13 +24,11 @@ const client = new wtClient({
 
 The `verifyAndDecode` method can by used by passing in the jwt as a single argument.
 
-It accepts a generic response type which extends the base JWT claims.
-
 ```typescript
 const payload = client.verifyAndDecode(token)
 
 //Check for custom claims using hasClaim method
-const hasEmailVerifiedClaim = client.hasClaim(payload, 'emailVerified')
+const hasEmailVerifiedClaim = hasClaim(payload, 'emailVerified')
 ```
 
 ## [Contributors](CONTRIBUTORS.md)
