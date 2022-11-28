@@ -1,13 +1,13 @@
 {
-  "name": "token-verifier",
+  "name": "token-verify",
   "version": "0.1.0",
   "description": "Token client for verifying and decoding JWTs.",
   "author": "NorthOne <developers@northone.com>",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/northone/token-verifier#readme",
+  "homepage": "https://github.com/northone-inc/token-verify",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/northone/token-verifier.git"
+    "url": "git@github.com:northone-inc/token-verify.git"
   },
   "keywords": [
     "token",
