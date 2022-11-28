@@ -78,9 +78,8 @@ export class JwtClient {
 
     return decodedToken
   }
-
-  public hasClaim(payload: jwtoken.JwtPayload, claim: string): boolean {
-    return claim in payload && payload[claim] !== undefined
-  }
 }
 
+export const hasClaim = (payload: jwtoken.JwtPayload, claim: string): boolean => {
+  return claim in payload && payload[claim] !== undefined
+}
