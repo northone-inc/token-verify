@@ -1,7 +1,9 @@
+> **Warning**
+> This project is still experimental, not for production use - FEATURES MAY CHANGE WITHOUT WARNING
+
 # Token Verifier
 
-This project exports a JWT client with capabilities to verify and decode tokens encrypted by RSA. The package uses [jsonwebtokens](https://www.npmjs.com/package/
-jsonwebtoken) and [jwks-rsa](https://www.npmjs.com/package/jwks-rsa).
+This project exports a JWT client with capabilities to verify and decode tokens encrypted by RSA. The package uses [jsonwebtokens](https://www.npmjs.com/package/jsonwebtoken) and [jwks-rsa](https://www.npmjs.com/package/jwks-rsa).
 
 ## Usage Requirements
 - Node 14 || 16 || 18

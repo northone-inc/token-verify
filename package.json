@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Token client for verifying and decoding JWTs.",
   "author": "NorthOne <developers@northone.com>",
-  "license": "ISC",
+  "license": "MIT",
   "homepage": "https://bitbucket.org/northone/token-verifier#readme",
   "repository": {
     "type": "git",
