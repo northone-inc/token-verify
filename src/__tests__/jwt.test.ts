@@ -1,6 +1,6 @@
 import createJWKSMock from 'mock-jwks'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-import { jwtClient as jwtSourceClient } from '../jwt'
+import { JwtClient as JwtSourceClient } from '../jwt'
 
 const testAudience = 'private'
 const testIssuers = ['primary', 'secondary']
@@ -9,13 +9,14 @@ class ImportError extends Error {}
 
 describe('jwtClient', () => {
   let jwksMock: ReturnType<typeof createJWKSMock>
-  let tokenClient: ReturnType<typeof jwtSourceClient>
-  let client: typeof jwtSourceClient
+  // let tokenClient: ReturnType<typeof JwtSourceClient>
+  let tokenClient: JwtSourceClient
+  let Client: typeof JwtSourceClient
 
   const createContext = () => {
     const jwksUri = 'https://test.com/.well-known/jwks.json'
     const jwksMock = createJWKSMock('https://test.com')
-    const tokenClient = client({
+    const tokenClient = new Client({
       audience: testAudience,
       issuer: testIssuers,
       jwksUri,
@@ -30,7 +31,7 @@ describe('jwtClient', () => {
     // If env var "VITEST_USE_DIST" has any truthy value (not "false" and not "0")
     // run tests against the built dist client instead of typescreipt
     // default is using default typescript client
-    client = jwtSourceClient
+    Client = JwtSourceClient
     const sourceModulePath = '../../dist/jwt'
     if (process.env.VITEST_USE_DIST
         && process.env.VITEST_USE_DIST.length > 0
@@ -38,7 +39,7 @@ describe('jwtClient', () => {
         && process.env.VITEST_USE_DIST !== '0'
     ) {
       try {
-        client = await import(sourceModulePath)
+        Client = await import(sourceModulePath)
       }
       catch (e) {
         throw new ImportError(`Unable to import module ${sourceModulePath}. You must build first to process.env.DIST`)

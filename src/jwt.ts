@@ -1,63 +1,86 @@
-import * as jwks from 'jwks-rsa'
-import * as jwt from 'jsonwebtoken'
+import * as jwtoken from 'jsonwebtoken'
+import jwksRsa = require('jwks-rsa')
 
-export const jwtClient = ({
-  audience,
-  jwksUri,
-  issuer,
-}: {
-  /**
-   * The intended audience to verify on incoming tokens
-   */
-  audience: jwt.VerifyOptions['audience']
-  /**
-   * The intended issuer(s) to verify on incoming tokens
-   */
-  issuer: jwt.VerifyOptions['issuer']
-  /**
-   * URI where jwt public key is stored
-   */
-  jwksUri: jwks.Options['jwksUri']
-  /**
-   * Advanced: Escape catch to for full JwksClient options
-   */
-  jwks?: jwks.Options
-  /**
-   * Advanced: Escape catch to configure jwt with VerifyOptions
-   */
-  jwt?: jwt.VerifyOptions
-}) => {
-  const jwksClient = new jwks.JwksClient({ jwksUri, ...(jwks || {}) })
-  let publicKey: string | undefined
+export class JwtClient {
+  private jwksClient: jwksRsa.JwksClient
+  private publicKey: string | undefined
+  private audience: jwtoken.VerifyOptions['audience']
+  private issuer: jwtoken.VerifyOptions['issuer']
+  private jwt: jwtoken.VerifyOptions | undefined
 
-  const getPublicKey = async (): Promise<string> => {
-    if (publicKey)
-      return publicKey
-
-    const signingKeys = await jwksClient.getSigningKeys()
-
-    if (!signingKeys || !signingKeys[0]) {
-      throw new Error('No keys returned')
-    }
-
-    const keyInfo = signingKeys[0]
-    publicKey = 'publicKey' in keyInfo ? keyInfo.publicKey : keyInfo.rsaPublicKey
-
-    return publicKey
+  constructor({
+    audience,
+    jwksUri,
+    issuer,
+    jwks,
+    jwt,
+  }: {
+    /**
+     * The audience to be verified on incoming tokens
+     */
+    audience: jwtoken.VerifyOptions['audience']
+    /**
+     * The issuer(s) to be verified on incoming tokens
+     */
+    issuer: jwtoken.VerifyOptions['issuer']
+    /**
+     * URI where jwt public key is stored
+     */
+    jwksUri: jwksRsa.Options['jwksUri']
+    /**
+     * Advanced: Escape hatch to for full JwksClient options
+     */
+    jwks?: jwksRsa.Options
+    /**
+     * Advanced: Escape hatch to configure jwt with VerifyOptions
+     */
+    jwt?: jwtoken.VerifyOptions
+  }) {
+    this.jwksClient = jwksRsa({ jwksUri, ...(jwks || {}) })
+    this.audience = audience
+    this.issuer = issuer
+    this.jwt = jwt
   }
 
-  const verifyAndDecode = async (token: string): Promise<string | jwt.JwtPayload> => {
-    const pubKey = await getPublicKey()
+  private async getPublicKey(): Promise<string> {
+    if (this.publicKey) {
+      return this.publicKey
+    }
 
-    const decodedToken = jwt.verify(token, pubKey, {
-      audience,
-      issuer,
+    try {
+      const signingKeys = await this.jwksClient.getSigningKeys()
+
+      if (!signingKeys || !signingKeys[0]) {
+        throw new Error('No keys returned')
+      }
+
+      const keyInfo = signingKeys[0]
+      this.publicKey = 'publicKey' in keyInfo ? keyInfo.publicKey : keyInfo.rsaPublicKey
+
+      return this.publicKey
+    }
+    catch (e) {
+      throw new Error(`Error gettings signing keys: ${e}`)
+    }
+  }
+
+  public async verifyAndDecode(token: string): Promise<jwtoken.JwtPayload> {
+    const pubKey = await this.getPublicKey()
+
+    const decodedToken = jwtoken.verify(token, pubKey, {
+      audience: this.audience,
+      issuer: this.issuer,
+      ...(this.jwt || {}),
     })
+    if (typeof decodedToken === 'string') {
+      throw new TypeError('Error verifying token')
+    }
+
     return decodedToken
   }
 
-
-  return {
-    verifyAndDecode,
+  public hasClaim(payload: jwtoken.JwtPayload, claim: string): boolean {
+    return claim in payload && payload[claim] !== undefined
   }
 }
+

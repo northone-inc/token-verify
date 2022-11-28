@@ -11,7 +11,7 @@ jsonwebtoken) and [jwks-rsa](https://www.npmjs.com/package/jwks-rsa).
 To create a new client, provide the expected audience, public key issuer (jwksUri), and token issuers to the `jwtClient`.
 
 ```typescript
-const client = jwtClient({
+const client = new wtClient({
   audience: 'apiAudience',
   jwksUri: 'pub-key.auth-issuer.com/.well-known/jwks.json',
   issuer: ['primary-issuer.com', 'secondary-issuer.com'],
@@ -27,17 +27,10 @@ The `verifyAndDecode` method can by used by passing in the jwt as a single argum
 It accepts a generic response type which extends the base JWT claims.
 
 ```typescript
-interface CustomPayload {
-  buyPizzaClaim?: boolean
-}
+const payload = client.verifyAndDecode(token)
 
-const payload = client.verifyAndDecode<CustomPayload>(token)
-
-//Editor can now use intellisense for custom payload
-const buyPizzaClaimValue = payload?.buyPizzaClaim
-
-//Inferred payload type will include base JWT claims
-const aud = payload.aud
+//Check for custom claims using hasClaim method
+const hasEmailVerifiedClaim = client.hasClaim(payload, 'emailVerified')
 ```
 
 ## [Contributors](CONTRIBUTORS.md)
