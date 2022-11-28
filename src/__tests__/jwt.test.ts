@@ -1,54 +1,48 @@
 import createJWKSMock from 'mock-jwks'
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-import { JwtClient as JwtSourceClient } from '../jwt'
+import * as SourceModule from '../jwt'
 
 const testAudience = 'private'
 const testIssuers = ['primary', 'secondary']
 
 class ImportError extends Error {}
 
-describe('jwtClient', () => {
+describe('jwtClient', async () => {
   let jwksMock: ReturnType<typeof createJWKSMock>
-  // let tokenClient: ReturnType<typeof JwtSourceClient>
-  let tokenClient: JwtSourceClient
-  let Client: typeof JwtSourceClient
+  // let tokenClient: ReturnType<typeof SourceModule.JwtClient>
+  let tokenClient: SourceModule.JwtClient
+  let Client = SourceModule.JwtClient
+
+  // If env var "VITEST_USE_DIST" has any truthy value (not "false" and not "0")
+  // run tests against the built dist client instead of typescreipt
+  // default is using default typescript client
+  const sourceModulePath = '../../dist/jwt'
+  if (process.env.VITEST_USE_DIST
+      && process.env.VITEST_USE_DIST.length > 0
+      && process.env.VITEST_USE_DIST.toString().toLowerCase() !== 'false'
+      && process.env.VITEST_USE_DIST !== '0'
+  ) {
+    try {
+      const DistModule = await import(sourceModulePath)
+      Client = DistModule.JwtClient
+    }
+    catch (e) {
+      throw new ImportError(`Unable to import module ${sourceModulePath}. You must build first to process.env.DIST`)
+    }
+  }
 
   const createContext = () => {
     const jwksUri = 'https://test.com/.well-known/jwks.json'
-    const jwksMock = createJWKSMock('https://test.com')
-    const tokenClient = new Client({
+    jwksMock = createJWKSMock('https://test.com')
+    tokenClient = new Client({
       audience: testAudience,
       issuer: testIssuers,
       jwksUri,
     })
-    return {
-      jwksMock,
-      tokenClient,
-    }
   }
 
-  beforeAll(async () => {
-    // If env var "VITEST_USE_DIST" has any truthy value (not "false" and not "0")
-    // run tests against the built dist client instead of typescreipt
-    // default is using default typescript client
-    Client = JwtSourceClient
-    const sourceModulePath = '../../dist/jwt'
-    if (process.env.VITEST_USE_DIST
-        && process.env.VITEST_USE_DIST.length > 0
-        && process.env.VITEST_USE_DIST.toString().toLowerCase() !== 'false'
-        && process.env.VITEST_USE_DIST !== '0'
-    ) {
-      try {
-        Client = await import(sourceModulePath)
-      }
-      catch (e) {
-        throw new ImportError(`Unable to import module ${sourceModulePath}. You must build first to process.env.DIST`)
-      }
-    }
-  })
-
   beforeEach(() => {
-    ({ jwksMock, tokenClient } = createContext())
+    createContext()
   })
   afterEach(async () => await jwksMock.stop())
 
