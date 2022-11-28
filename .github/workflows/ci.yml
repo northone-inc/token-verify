@@ -12,6 +12,7 @@ on:
 
 env:
   VITEST_SEGFAULT_RETRY: 3
+  VITEST_USE_DIST: true
 
 jobs:
   lint:
