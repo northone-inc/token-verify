@@ -24,14 +24,14 @@
     "node": "^14 || ^16 || ^18"
   },
   "scripts": {
-    "build": "$(npm bin)/esbuild src/jwt.ts --bundle --outdir=dist --platform=node --external:jsonwebtoken --external:jwks-rsa",
-    "test": "$(npm bin)/vitest",
+    "build": "esbuild src/jwt.ts --bundle --outdir=dist --platform=node --external:jsonwebtoken --external:jwks-rsa",
+    "test": "vitest",
     "test:dist": "VITEST_USE_DIST=true npm run test",
-    "lint": "$(npm bin)/eslint .",
-    "lint:fix": "$(npm bin)/eslint . --fix",
-    "typegen": "$(npm bin)/tsc src/jwt.ts --declaration --emitDeclarationOnly --outDir dist",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typegen": "tsc src/jwt.ts --declaration --emitDeclarationOnly --outDir dist",
     "postbuild": "npm run typegen",
-    "typecheck": "$(npm bin)/tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "contributers": [
     "Duncan Mann <duncan@northone.com>"
