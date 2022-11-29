@@ -23,6 +23,7 @@
   "engines": {
     "node": "^14 || ^16 || ^18"
   },
+  "files": ["dist/**/*"],
   "scripts": {
     "build": "esbuild src/jwt.ts --bundle --outdir=dist --platform=node --external:jsonwebtoken --external:jwks-rsa",
     "test": "vitest",
@@ -31,6 +32,7 @@
     "lint:fix": "eslint . --fix",
     "typegen": "tsc src/jwt.ts --declaration --emitDeclarationOnly --outDir dist",
     "postbuild": "npm run typegen",
+    "prepublish": "npm run build",
     "typecheck": "tsc --noEmit"
   },
   "contributers": [
