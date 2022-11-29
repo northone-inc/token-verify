@@ -1,15 +1,23 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - '*'
-  # pull_request:
-  #   branches:
-  #     - '*'
-  #   types:
-  #     - opened
-  create: null
+  workflow_dispatch:
+    push:
+      branches:
+        - '*'
+        - '*/**'
+        - main
+
+# on: create
+# push:
+#     branches:
+#       - '*'
+#   # pull_request:
+#   #   branches:
+#   #     - '*'
+#   #   types:
+#   #     - opened
+#   create: 'GitHub Workflow'
 
 env:
   VITEST_SEGFAULT_RETRY: 3
