@@ -1,13 +1,12 @@
 name: CI
 
 on:
-  workflow_dispatch:
-    push:
-      branches:
-        - '*'
-        - '*/**'
-        - main
-
+  push:
+    branches:
+      - '*'
+      - '*/**'
+      - main
+  # create: ""
 # on: create
 # push:
 #     branches:
