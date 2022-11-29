@@ -1,0 +1,9 @@
+.nvmrc
+Brewfile
+Brewfile.lock.json
+vitest.config.ts
+.vscode
+docs
+.eslintrc
+.gitignore
+src
