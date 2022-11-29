@@ -20,9 +20,6 @@
   ],
   "main": "dist/jwt.js",
   "types": "dist/jwt.d.ts",
-  "files": [
-    "dist/**/*"
-  ],
   "engines": {
     "node": "^14 || ^16 || ^18"
   },
