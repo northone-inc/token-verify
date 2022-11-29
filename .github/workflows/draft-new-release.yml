@@ -55,6 +55,7 @@ jobs:
           gh pr create \
             --base main \
             --title "Release version ${{ github.event.inputs.version }}" \
+            --fill \
             --reviewer ${{ github.actor }}
 
       # - name: Create pull request
