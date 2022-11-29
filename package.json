@@ -20,7 +20,9 @@
   ],
   "main": "dist/jwt.js",
   "types": "dist/jwt.d.ts",
-  "files": ["dist/**/*"],
+  "files": [
+    "dist/**/*"
+  ],
   "engines": {
     "node": "^14 || ^16 || ^18"
   },
@@ -32,7 +34,6 @@
     "lint:fix": "eslint . --fix",
     "typegen": "tsc src/jwt.ts --declaration --emitDeclarationOnly --outDir dist",
     "postbuild": "npm run typegen",
-    "prepublish": "npm run build",
     "typecheck": "tsc --noEmit"
   },
   "contributers": [
