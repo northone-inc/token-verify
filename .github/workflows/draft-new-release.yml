@@ -59,6 +59,8 @@ jobs:
             --fill \
             --reviewer ${{ github.actor }}
       - name: trigger first ci on release branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh workflow run "CI" --ref release/${{ github.event.inputs.version }}
 
