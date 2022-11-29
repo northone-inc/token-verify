@@ -58,6 +58,9 @@ jobs:
             --title "Release version ${{ github.event.inputs.version }}" \
             --fill \
             --reviewer ${{ github.actor }}
+      - name: trigger first ci on release branch
+        run: |
+          gh workflow run "CI" --ref release/${{ github.event.inputs.version }}
 
       # - name: Create pull request
       #   uses: thomaseizinger/create-pull-request@1.0.0
