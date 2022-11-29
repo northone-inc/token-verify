@@ -20,10 +20,10 @@
   ],
   "main": "dist/jwt.js",
   "types": "dist/jwt.d.ts",
+  "files": ["dist/**/*"],
   "engines": {
     "node": "^14 || ^16 || ^18"
   },
-  "files": ["dist/**/*"],
   "scripts": {
     "build": "esbuild src/jwt.ts --bundle --outdir=dist --platform=node --external:jsonwebtoken --external:jwks-rsa",
     "test": "vitest",
