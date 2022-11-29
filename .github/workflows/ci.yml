@@ -9,6 +9,7 @@ on:
       - '*'
     types:
       - opened
+  create: null
 
 env:
   VITEST_SEGFAULT_RETRY: 3
