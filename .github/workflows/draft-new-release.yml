@@ -1,16 +1,16 @@
 # inpsired by https://github.com/thomaseizinger/github-action-gitflow-release-workflow/blob/dev/.github/workflows/draft-new-release.yml
-name: "Draft new release"
+name: Draft new release
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'The version you want to release.'
+        description: The version you want to release.
         required: true
 
 jobs:
   draft-new-release:
-    name: "Draft a new release"
+    name: Draft a new release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

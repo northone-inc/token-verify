@@ -31,7 +31,8 @@
     "lint:fix": "eslint . --fix",
     "typegen": "tsc src/jwt.ts --declaration --emitDeclarationOnly --outDir dist",
     "postbuild": "npm run typegen",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepare": "husky install"
   },
   "contributers": [
     "Duncan Mann <duncan@northone.com>"
@@ -45,6 +46,7 @@
     "@tsconfig/node16": "^1.0.3",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
+    "husky": "^8.0.2",
     "mock-jwks": "^1.0.8",
     "nock": "^13.2.9",
     "typescript": "^4.8.4",

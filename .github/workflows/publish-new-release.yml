@@ -1,5 +1,5 @@
 # inspired by https://github.com/thomaseizinger/github-action-gitflow-release-workflow/blob/dev/.github/workflows/publish-new-release.yml
-name: "Publish new release"
+name: Publish new release
 
 on:
   pull_request:
@@ -37,14 +37,14 @@ jobs:
           VERSION=${BRANCH_NAME#hotfix/}
 
           echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
-          
+
       - name: Create Github Release
         if: ${{ env.RELEASE_VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create "v${{ env.RELEASE_VERSION }}" --generate-notes
-      
+
       - name: Merge Release into Main
         if: ${{ env.RELEASE_VERSION }}
         run: |
