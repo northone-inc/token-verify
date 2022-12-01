@@ -1,4 +1,4 @@
-name: Unpublish npmjs version on gh release delete
+name: Unpublish npmjs version
 
 on:
   release:
