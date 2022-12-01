@@ -36,9 +36,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm version ${{env.RELEASE_VERSION}} --no-git-tag-version
-
-          git add package.json package-lock.json
-          git commit -m "chore: bump version to ${{env.RELEASE_VERSION}}"
-          git show
+          # git add package.json package-lock.json
+          # git commit -m "chore: bump version to ${{env.RELEASE_VERSION}}"
+          # git show
           npm publish
-          git push origin HEAD:main
+          git push
