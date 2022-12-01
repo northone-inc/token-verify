@@ -1,0 +1,31 @@
+name: Publish Package to npmjs
+on:
+  release:
+    types: [published]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm run build
+      - name: debug
+        run: |
+          RELEASE_NAME="${{github.event.release.name}}"
+          IS_DRAFT="${{github.event.release.isDraft}}"
+          TAG="${{github.event.release.tag}}"
+          TAG_NAME="${{github.event.release.tagName}}"
+
+          echo "RELEASE_NAME: $RELEASE_NAME"
+          echo "IS_DRAFT: $IS_DRAFT"
+          echo "TAG: $TAG"
+          echo "TAG_NAME: $TAG_NAME"
+
+      # - run: npm publish
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -7,7 +7,7 @@
   "homepage": "https://github.com/northone-inc/token-verify",
   "repository": {
     "type": "git",
-    "url": "git@github.com:northone-inc/token-verify.git"
+    "url": "https://github.com/northone-inc/token-verify.git"
   },
   "keywords": [
     "token",
