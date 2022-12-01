@@ -40,4 +40,4 @@ jobs:
           # git commit -m "chore: bump version to ${{env.RELEASE_VERSION}}"
           # git show
           npm publish
-          git push
+          git push origin HEAD:main
