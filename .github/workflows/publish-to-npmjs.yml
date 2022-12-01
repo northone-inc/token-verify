@@ -17,6 +17,7 @@ jobs:
       - name: debug
         run: |
           RELEASE_NAME="${{github.event.release.name}}"
+          VERSION="${RELEASE_NAME:1}"
           IS_DRAFT="${{github.event.release.draft}}"
           BODY="${{github.event.release.body}}"
           TAG_NAME="${{github.event.release.tag_name}}"
@@ -25,7 +26,7 @@ jobs:
           echo "IS_DRAFT: $IS_DRAFT"
           echo "TAG_NAME: $TAG_NAME"
           echo "BODY: $BODY"
-
+      - run: npm version ${{github.event.release.tag_name}} --allow-same-version
       # - run: npm publish
       #   env:
       #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
