@@ -35,7 +35,7 @@ jobs:
           echo "BODY: $BODY"
       - run: |
           npm version ${{env.RELEASE_VERSION}} --no-git-tag-version
-          git add --all
+          git add package.json package-lock.json
           git commit -m "chore: bump version to ${{env.RELEASE_VERSION}}"
       # git push origin HEAD:main
       # - run: npm publish
