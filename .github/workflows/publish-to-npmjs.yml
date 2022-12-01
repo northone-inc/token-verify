@@ -17,14 +17,15 @@ jobs:
       - name: debug
         run: |
           RELEASE_NAME="${{github.event.release.name}}"
-          VERSION="${RELEASE_NAME:1}"
           IS_DRAFT="${{github.event.release.draft}}"
           BODY="${{github.event.release.body}}"
           TAG_NAME="${{github.event.release.tag_name}}"
+          VERSION="${TAG_NAME:1}"
 
           echo "RELEASE_NAME: $RELEASE_NAME"
           echo "IS_DRAFT: $IS_DRAFT"
           echo "TAG_NAME: $TAG_NAME"
+          echo "VERSION: $VERSION"
           echo "BODY: $BODY"
       - run: npm version ${{github.event.release.tag_name}} --allow-same-version
       # - run: npm publish
