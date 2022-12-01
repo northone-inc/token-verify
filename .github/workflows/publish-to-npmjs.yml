@@ -18,24 +18,27 @@ jobs:
           git config user.email noreply@github.com
       - run: npm ci
       - run: npm run build
-      - name: debug
-        run: |
-          RELEASE_NAME="${{github.event.release.name}}"
-          IS_DRAFT="${{github.event.release.draft}}"
-          BODY="${{github.event.release.body}}"
-          TAG_NAME="${{github.event.release.tag_name}}"
-          VERSION="${TAG_NAME:1}"
+      # - name: debug
+      #   run: |
+      #     RELEASE_NAME="${{github.event.release.name}}"
+      #     IS_DRAFT="${{github.event.release.draft}}"
+      #     BODY="${{github.event.release.body}}"
+      #     TAG_NAME="${{github.event.release.tag_name}}"
+      #     VERSION="${TAG_NAME:1}"
 
-          echo "RELEASE_NAME: $RELEASE_NAME"
-          echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
-          echo "IS_DRAFT: $IS_DRAFT"
-          echo "TAG_NAME: $TAG_NAME"
-          echo "VERSION: $VERSION"
-          echo "BODY: $BODY"
-      - name: bump version, publish, and commit to main
+      #     echo "RELEASE_NAME: $RELEASE_NAME"
+      #     echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
+      #     echo "IS_DRAFT: $IS_DRAFT"
+      #     echo "TAG_NAME: $TAG_NAME"
+      #     echo "VERSION: $VERSION"
+      #     echo "BODY: $BODY"
+      - name: Bump, Publish, Commit to main
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          TAG_NAME="${{github.event.release.tag_name}}"
+          RELEASE_VERSION="${TAG_NAME:1}"
           npm version ${{env.RELEASE_VERSION}} --no-git-tag-version
           git add package.json package-lock.json
           git commit -m "chore: bump version to ${{env.RELEASE_VERSION}}"
