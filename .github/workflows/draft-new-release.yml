@@ -55,7 +55,7 @@ jobs:
         run: |
           gh pr create \
             --base main \
-            --head release/${{ github.event.inputs.version }}
+            --head release/${{ github.event.inputs.version }} \
             --title "Release version ${{ github.event.inputs.version }}" \
             --body "" \
             --fill \
