@@ -1,4 +1,4 @@
-name: Unpublish npmjs package version when github version deleted
+name: Unpublish npmjs version on gh release delete
 
 on:
   release:
