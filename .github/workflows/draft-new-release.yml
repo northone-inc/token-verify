@@ -60,6 +60,14 @@ jobs:
             --body "" \
             --fill \
             --reviewer ${{ github.actor }}
+      - name: Trigger first CI workflow on release branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git checkout release/${{ github.event.inputs.version }}
+          git pull origin release/${{ github.event.inputs.version }}
+          git commit -m 'release v${{ github.event.inputs.version }} drafted' --allow-empty
+          git push origin release/${{ github.event.inputs.version }}
 
       # - name: Create pull request
       #   uses: thomaseizinger/create-pull-request@1.0.0
