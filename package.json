@@ -23,6 +23,7 @@
   "engines": {
     "node": "^14 || ^16 || ^18"
   },
+  "files": ["dist/jwt.js", "dist/jwt.d.ts", "package.json", "package-lock.json", "README.md", "LICENSE"],
   "scripts": {
     "build": "esbuild src/jwt.ts --bundle --outdir=dist --platform=node --external:jsonwebtoken --external:jwks-rsa",
     "test": "vitest",
