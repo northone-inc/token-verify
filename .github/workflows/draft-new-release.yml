@@ -44,6 +44,7 @@ jobs:
         run: |
           echo 'TODO: git add CHANGELOG.md'
           git add package.json package-lock.json
+          git commit -m 'version bump ${{ github.event.inputs.version }}'
           git push origin release/${{ github.event.inputs.version }}
 
           echo "::set-output name=commit::$(git rev-parse HEAD)"
