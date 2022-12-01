@@ -1,0 +1,24 @@
+name: Unpublish npmjs package version when github version deleted
+
+on:
+  release:
+    types: [deleted]
+jobs:
+  unpublish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          registry-url: 'https://registry.npmjs.org'
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "GitHub actions"
+          git config user.email
+      - run: |
+          VERSION="${{github.event.release.tag_name:1}}"
+          npm unpublish $(node -p "require('./package.json').name")@$VERSION --force --dry-run
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
