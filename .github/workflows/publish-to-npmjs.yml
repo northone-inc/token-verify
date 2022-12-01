@@ -35,9 +35,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm version ${{env.RELEASE_VERSION}} --no-git-tag-version
-          # git add package.json package-lock.json
-          # git commit -m "chore: bump version to ${{env.RELEASE_VERSION}}"
-          # git show
+          npm version ${{env.RELEASE_VERSION}} --no-git-tag-version -m "chore: bump version %s"
           npm publish
           git push origin HEAD:main
