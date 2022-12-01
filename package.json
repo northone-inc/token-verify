@@ -1,6 +1,6 @@
 {
   "name": "token-verify",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Token client for verifying and decoding JWTs.",
   "author": "NorthOne <developers@northone.com>",
   "license": "MIT",
