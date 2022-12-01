@@ -42,9 +42,8 @@ jobs:
       - name: Commit changelog and manifest files
         id: make-commit
         run: |
-          echo 'TODO: git add CHANGELOG.md package.json'
+          echo 'TODO: git add CHANGELOG.md'
           git add package.json package-lock.json
-          git commit --message "Prep release v${{ github.event.inputs.version }}"
           git push origin release/${{ github.event.inputs.version }}
 
           echo "::set-output name=commit::$(git rev-parse HEAD)"
