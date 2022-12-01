@@ -45,22 +45,31 @@ jobs:
       #     git merge $RELEASE_BRANCH main
 
       # publish package
-      - if: ${{ env.RELEASE_VERSION }}
-        run: npm ci
-      - if: ${{ env.RELEASE_VERSION }}
-        run: npm run build
+      - if: ${{ env.RELEASE_VERSION }} != null
+        name: check if should release
+        run: exit 0
+
+      - run: npm ci
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          registry-url: 'https://registry.npmjs.org'
+
       - name: Publish ${{ env.RELEASE_VERSION }} to npmjs.org
-        if: ${{ env.RELEASE_VERSION }}
         run: npm publish
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Create Github Release
-        if: ${{ env.RELEASE_VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "v${{ env.RELEASE_VERSION }}" --generate-notes
+        run: gh release create "v${{ env.RELEASE_VERSION }}" --generate-notes
 
       # if needed, you can checkout the latest master here, build artifacts and publish / deploy them somewhere
       # the create-release action has an output `upload_url` output that you can use to upload assets
