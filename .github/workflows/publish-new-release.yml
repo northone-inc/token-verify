@@ -45,11 +45,9 @@ jobs:
       #     git merge $RELEASE_BRANCH main
 
       # publish package
-      - if: ${{ env.RELEASE_VERSION }} != null
+      - if: ${{ env.RELEASE_VERSION }} == null
         name: check if should release
-        run: exit 0
-
-      - run: npm ci
+        run: exit 1
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -59,6 +57,9 @@ jobs:
         with:
           node-version: 16.x
           registry-url: 'https://registry.npmjs.org'
+      
+      - run: npm ci
+      - run: npm run build
 
       - name: Publish ${{ env.RELEASE_VERSION }} to npmjs.org
         run: npm publish
