@@ -1,6 +1,6 @@
 {
   "name": "token-verify",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Token client for verifying and decoding JWTs.",
   "author": "NorthOne <developers@northone.com>",
   "license": "MIT",
@@ -20,7 +20,14 @@
   ],
   "main": "dist/jwt.js",
   "types": "dist/jwt.d.ts",
-  "files": ["dist/jwt.js", "dist/jwt.d.ts", "package.json", "package-lock.json", "README.md", "LICENSE"],
+  "files": [
+    "dist/jwt.js",
+    "dist/jwt.d.ts",
+    "package.json",
+    "package-lock.json",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": "^14 || ^16 || ^18"
   },
