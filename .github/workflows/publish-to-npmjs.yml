@@ -34,7 +34,7 @@ jobs:
           echo "VERSION: $VERSION"
           echo "BODY: $BODY"
       - run: |
-          npm version ${{env.RELEASE_VERSION}} --allow-same-version
+          npm version ${{env.RELEASE_VERSION}} --no-git-tag-version
           git add --all
           git commit -m "chore: bump version to ${{env.RELEASE_VERSION}}"
       # git push origin HEAD:main
