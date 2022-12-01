@@ -12,6 +12,10 @@ jobs:
         with:
           node-version: 16.x
           registry-url: 'https://registry.npmjs.org'
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "GitHub actions"
+          git config user.email noreply@github.com
       - run: npm ci
       - run: npm run build
       - name: debug
@@ -22,12 +26,18 @@ jobs:
           TAG_NAME="${{github.event.release.tag_name}}"
           VERSION="${TAG_NAME:1}"
 
+          echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
+
           echo "RELEASE_NAME: $RELEASE_NAME"
           echo "IS_DRAFT: $IS_DRAFT"
           echo "TAG_NAME: $TAG_NAME"
           echo "VERSION: $VERSION"
           echo "BODY: $BODY"
-      - run: npm version ${{github.event.release.tag_name}} --allow-same-version
+      - run: |
+          npm version ${{env.RELEASE_VERSION}} --allow-same-version
+          git add --all
+          git commit -m "chore: bump version to ${{env.RELEASE_VERSION}}"
+      # git push origin HEAD:main
       # - run: npm publish
       #   env:
       #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
