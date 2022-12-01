@@ -17,14 +17,14 @@ jobs:
       - name: debug
         run: |
           RELEASE_NAME="${{github.event.release.name}}"
-          IS_DRAFT="${{github.event.release.isDraft}}"
-          TAG="${{github.event.release.tag}}"
-          TAG_NAME="${{github.event.release.tagName}}"
+          IS_DRAFT="${{github.event.release.draft}}"
+          BODY="${{github.event.release.body}}"
+          TAG_NAME="${{github.event.release.tag_name}}"
 
           echo "RELEASE_NAME: $RELEASE_NAME"
           echo "IS_DRAFT: $IS_DRAFT"
-          echo "TAG: $TAG"
           echo "TAG_NAME: $TAG_NAME"
+          echo "BODY: $BODY"
 
       # - run: npm publish
       #   env:
