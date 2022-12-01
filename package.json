@@ -20,6 +20,7 @@
   ],
   "main": "dist/jwt.js",
   "types": "dist/jwt.d.ts",
+  "files": ["dist/jwt.js", "dist/jwt.d.ts", "package.json", "package-lock.json", "README.md", "LICENSE"],
   "engines": {
     "node": "^14 || ^16 || ^18"
   },
