@@ -14,7 +14,7 @@ This project exports a JWT client with capabilities to verify and decode tokens 
 To create a new client, provide the expected audience, public key issuer (jwksUri), and token issuers to the `jwtClient`.
 
 ```typescript
-const client = new wtClient({
+const client = new JwtClient({
   audience: 'apiAudience',
   jwksUri: 'pub-key.auth-issuer.com/.well-known/jwks.json',
   issuer: ['primary-issuer.com', 'secondary-issuer.com'],
