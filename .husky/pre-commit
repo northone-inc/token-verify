@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+export CI=true
+
+npm run test
+npm run lint:fix && git add --all
+npm run typecheck

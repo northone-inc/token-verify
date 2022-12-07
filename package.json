@@ -1,13 +1,13 @@
 {
   "name": "token-verify",
-  "version": "0.1.0",
+  "version": "0.1.6",
   "description": "Token client for verifying and decoding JWTs.",
   "author": "NorthOne <developers@northone.com>",
   "license": "MIT",
   "homepage": "https://github.com/northone-inc/token-verify",
   "repository": {
     "type": "git",
-    "url": "git@github.com:northone-inc/token-verify.git"
+    "url": "https://github.com/northone-inc/token-verify.git"
   },
   "keywords": [
     "token",
@@ -20,6 +20,14 @@
   ],
   "main": "dist/jwt.js",
   "types": "dist/jwt.d.ts",
+  "files": [
+    "dist/jwt.js",
+    "dist/jwt.d.ts",
+    "package.json",
+    "package-lock.json",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": "^14 || ^16 || ^18"
   },
@@ -31,7 +39,8 @@
     "lint:fix": "eslint . --fix",
     "typegen": "tsc src/jwt.ts --declaration --emitDeclarationOnly --outDir dist",
     "postbuild": "npm run typegen",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepare": "husky install"
   },
   "contributers": [
     "Duncan Mann <duncan@northone.com>"
@@ -45,6 +54,7 @@
     "@tsconfig/node16": "^1.0.3",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
+    "husky": "^8.0.2",
     "mock-jwks": "^1.0.8",
     "nock": "^13.2.9",
     "typescript": "^4.8.4",

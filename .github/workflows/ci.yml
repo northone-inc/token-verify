@@ -3,12 +3,18 @@ name: CI
 on:
   push:
     branches:
-      # - main
-      - '*'
-
-  pull_request:
-    branches:
-      - main
+      - '**'
+  # create: ""
+# on: create
+# push:
+#     branches:
+#       - '*'
+#   # pull_request:
+#   #   branches:
+#   #     - '*'
+#   #   types:
+#   #     - opened
+#   create: 'GitHub Workflow'
 
 env:
   VITEST_SEGFAULT_RETRY: 3
@@ -57,8 +63,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        # os: [ubuntu-latest]
+        # os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest] # cheapest for now
         node_version: [14, 16, 18]
       fail-fast: false
 

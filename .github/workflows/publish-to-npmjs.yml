@@ -1,0 +1,42 @@
+name: Publish Release to Npmjs
+on:
+  release:
+    types: [published]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          registry-url: 'https://registry.npmjs.org'
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "GitHub actions"
+          git config user.email noreply@github.com
+      - run: npm ci
+      - run: npm run build
+      - name: get release version
+        run: |
+          RELEASE_NAME="${{github.event.release.name}}"
+          IS_DRAFT="${{github.event.release.draft}}"
+          BODY="${{github.event.release.body}}"
+          TAG_NAME="${{github.event.release.tag_name}}"
+          VERSION="${TAG_NAME:1}"
+          echo "RELEASE_NAME: $RELEASE_NAME"
+          echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "TAG_NAME: $TAG_NAME"
+          echo "VERSION: $VERSION"
+          echo "BODY: $BODY"
+      - name: Bump version and publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm version ${{env.RELEASE_VERSION}} --no-git-tag-version
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to ${{env.RELEASE_VERSION}}"
+          npm publish
+          git push origin HEAD:main
