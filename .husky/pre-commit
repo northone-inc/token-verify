@@ -4,5 +4,5 @@
 export CI=true
 
 npm run test
-npm run lint:fix && git add --all
+npm run lint:fix
 npm run typecheck
