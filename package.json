@@ -37,7 +37,7 @@
     "test:dist": "cross-env VITEST_USE_DIST=true npm run test",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typegen": "tsc src/jwt.ts --declaration --emitDeclarationOnly --outDir dist",
+    "typegen": "tsc src/jwt.ts --declaration --emitDeclarationOnly --outDir dist --esModuleInterop",
     "postbuild": "npm run typegen",
     "typecheck": "tsc --noEmit",
     "prepare": "husky install"
