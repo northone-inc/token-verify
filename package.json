@@ -46,7 +46,7 @@
     "Duncan Mann <duncan@northone.com>"
   ],
   "dependencies": {
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.0.0"
   },
   "devDependencies": {

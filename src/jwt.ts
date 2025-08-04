@@ -1,5 +1,5 @@
 import * as jwtoken from 'jsonwebtoken'
-import jwksRsa = require('jwks-rsa')
+import jwksRsa from 'jwks-rsa'
 
 export class JwtClient {
   private jwksClient: jwksRsa.JwksClient
