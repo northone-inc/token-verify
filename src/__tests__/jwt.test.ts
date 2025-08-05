@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import * as SourceModule from '../jwt'
 
 const testAudience = 'private'
-const testIssuers = ['primary', 'secondary']
+const testIssuers: [string, ...string[]] = ['primary', 'secondary']
 
 class ImportError extends Error {}
 
